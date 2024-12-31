@@ -156,6 +156,93 @@ public:
     int GetSize() {
         return size;
     }
+   
+};
+
+enum direction {
+    RIGHT = 0,
+    LEFT,
+    UP,
+    DOWN,
+};
+
+class BULLET : public UNIT {
+    enum direction d;
+public:
+    bool isActive;
+
+    BULLET() {
+        isActive = false;
+    }
+    BULLET(PLAYER player) {
+        d = RIGHT;
+        if (d == RIGHT) {
+            position.x = player.GetPosition().x + player.GetSize();
+            position.y = player.GetPosition().y + player.GetSize() / 2;
+        }
+
+        else if (d == LEFT) {
+            position.x = player.GetPosition().x;
+            position.y = player.GetPosition().y + player.GetSize() / 2;
+        }
+
+        else if (d == UP) {
+            position.x = player.GetPosition().x + player.GetSize() / 2;
+            position.y = player.GetPosition().y;
+        }
+
+        else if (d == DOWN) {
+            position.x = player.GetPosition().x + player.GetSize() / 2;
+            position.y = player.GetPosition().y + player.GetSize();
+        }
+        size = 10;
+        color = { 0, 0, 0 };
+    }
+
+    void Move(int amount) {
+        if (d == RIGHT) {
+            if (position.x + amount <= 800)
+                position.x += amount;
+            else
+                isActive = false;
+        }
+        if (d == LEFT) {
+            if( position.x >= -200 )
+                position.x -= amount;
+            else
+                isActive = false;
+        }
+        if (d == UP) {
+            if( position.y - amount >= -200 )
+                position.y -= amount;
+            else
+                isActive = false;
+        }
+        if (d == DOWN) {
+            if( position.y + amount <= 800 )
+                position.y += amount;
+            else
+                isActive = false;
+        }
+        
+    }
+
+    COLOR GetColor() {
+        return color;
+    }
+
+    POSITION GetPosition() const {
+        return position;
+    }
+
+    int GetSize() const {
+        return size;
+    }
+
+    void initiallization(PLAYER player) {
+        position = player.GetPosition();
+        size = player.GetSize();
+    }
 };
 
 //
@@ -171,11 +258,13 @@ public:
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PLAYER player{ 50, 50, 50, COLOR{255, 0, 0} };
+    static BULLET bullets[10];
 
     switch (message)
     {
     case WM_CREATE:
         SetTimer(hWnd, 1, 1000, NULL);
+        SetTimer(hWnd, 2, 10, NULL);
         break;
     case WM_KEYDOWN:
         switch (wParam)
@@ -192,6 +281,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case VK_LEFT:
             player.Move(-10, 0);
             break;
+        case VK_SPACE:
+            for (BULLET& bullet : bullets) {
+                if (!bullet.isActive) {
+                    bullet.isActive = true;
+                    bullet.initiallization(player);
+                    break;
+                }
+            }
+            break;
         }
 
         InvalidateRect(hWnd, NULL, TRUE);
@@ -201,6 +299,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case 1:
             player.Move(1, 0);
+            break;
+        case 2:
+            for (BULLET& bullet : bullets) {
+                if (bullet.isActive) {
+                    bullet.Move(10);
+                }
+            }
             break;
         }
 
@@ -215,7 +320,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HPEN OldPen = (HPEN)SelectObject(hdc, NewPen);
 
             Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
+            
 
+            for (const BULLET& bullet : bullets) {
+                if (bullet.isActive) {
+                    Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());
+                }
+            }
             SelectObject(hdc, OldPen);
             DeleteObject(NewPen);
 

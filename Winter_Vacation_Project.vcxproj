@@ -77,10 +77,10 @@
     <IncludePath>C:\Users\Owner\Desktop\Projects\Winter_Vacation_Project\header;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Owner\Desktop\Projects\Winter_Vacation_Project\header;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Owner\Desktop\Projects\Winter_Vacation_Project\header;C:\Users\신동호\source\repos\Winter_Vacation_Project\header;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\Owner\Desktop\Projects\Winter_Vacation_Project\header;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Owner\Desktop\Projects\Winter_Vacation_Project\header;C:\Users\신동호\source\repos\Winter_Vacation_Project\header;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
