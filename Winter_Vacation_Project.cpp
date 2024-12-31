@@ -2,6 +2,8 @@
 
 #include "framework.h"
 #include "Winter_Vacation_Project.h"
+#include <array>
+#include <vector>
 
 #define MAX_LOADSTRING 100
 
@@ -129,20 +131,36 @@ class MONSTER : UNIT {
 
 };
 
+enum direction {
+    RIGHT = 0,
+    LEFT,
+    UP,
+    DOWN,
+};
+
+constexpr int MAP_SIZE = 500;
+
 class PLAYER : UNIT {
+    enum direction d;
 public:
     PLAYER(int dx, int dy, int dsize, COLOR dcolor) {
         position.x = dx;
         position.y = dy;
         size = dsize;
         color = dcolor;
+        d = RIGHT;
     }
 
     void Move(int dx, int dy) {
-        if(position.x + dx >= 0 && position.x + size + dx <= 100)
+        if(position.x + dx >= 0 && position.x + size + dx <= MAP_SIZE)
             position.x += dx;
-        if(position.y + dy >= 0 && position.y + size + dy <= 100)
+        if(position.y + dy >= 0 && position.y + size + dy <= MAP_SIZE)
             position.y += dy;
+
+        if (dx > 0) d = RIGHT;
+        else if (dx < 0) d = LEFT;
+        else if (dy > 0) d = DOWN;
+        else d = UP;
     }
 
     COLOR GetColor() {
@@ -157,13 +175,9 @@ public:
         return size;
     }
    
-};
-
-enum direction {
-    RIGHT = 0,
-    LEFT,
-    UP,
-    DOWN,
+    enum direction GetDirection() {
+        return d;
+    }
 };
 
 class BULLET : public UNIT {
@@ -174,52 +188,53 @@ public:
     BULLET() {
         isActive = false;
     }
-    BULLET(PLAYER player) {
-        d = RIGHT;
-        if (d == RIGHT) {
-            position.x = player.GetPosition().x + player.GetSize();
-            position.y = player.GetPosition().y + player.GetSize() / 2;
-        }
 
-        else if (d == LEFT) {
-            position.x = player.GetPosition().x;
-            position.y = player.GetPosition().y + player.GetSize() / 2;
-        }
+    //BULLET(PLAYER player) {
+    //    d = RIGHT;
+    //    if (d == RIGHT) {
+    //        position.x = player.GetPosition().x + player.GetSize();
+    //        position.y = player.GetPosition().y + player.GetSize() / 2;
+    //    }
 
-        else if (d == UP) {
-            position.x = player.GetPosition().x + player.GetSize() / 2;
-            position.y = player.GetPosition().y;
-        }
+    //    else if (d == LEFT) {
+    //        position.x = player.GetPosition().x;
+    //        position.y = player.GetPosition().y + player.GetSize() / 2;
+    //    }
 
-        else if (d == DOWN) {
-            position.x = player.GetPosition().x + player.GetSize() / 2;
-            position.y = player.GetPosition().y + player.GetSize();
-        }
-        size = 10;
-        color = { 0, 0, 0 };
-    }
+    //    else if (d == UP) {
+    //        position.x = player.GetPosition().x + player.GetSize() / 2;
+    //        position.y = player.GetPosition().y;
+    //    }
+
+    //    else if (d == DOWN) {
+    //        position.x = player.GetPosition().x + player.GetSize() / 2;
+    //        position.y = player.GetPosition().y + player.GetSize();
+    //    }
+    //    size = 10;
+    //    color = { 0, 0, 0 };
+    //}
 
     void Move(int amount) {
         if (d == RIGHT) {
-            if (position.x + amount <= 800)
+            if (position.x + amount <= MAP_SIZE)
                 position.x += amount;
             else
                 isActive = false;
         }
         if (d == LEFT) {
-            if( position.x >= -200 )
+            if( position.x >= -MAP_SIZE)
                 position.x -= amount;
             else
                 isActive = false;
         }
         if (d == UP) {
-            if( position.y - amount >= -200 )
+            if( position.y - amount >= -MAP_SIZE)
                 position.y -= amount;
             else
                 isActive = false;
         }
         if (d == DOWN) {
-            if( position.y + amount <= 800 )
+            if( position.y + amount <= MAP_SIZE)
                 position.y += amount;
             else
                 isActive = false;
@@ -240,8 +255,27 @@ public:
     }
 
     void initiallization(PLAYER player) {
-        position = player.GetPosition();
-        size = player.GetSize();
+        d = player.GetDirection();
+
+        if (d == RIGHT) {
+            position.x = player.GetPosition().x + player.GetSize();
+            position.y = player.GetPosition().y + player.GetSize() / 2;
+        }
+        else if (d == LEFT) {
+            position.x = player.GetPosition().x;
+            position.y = player.GetPosition().y + player.GetSize() / 2;
+        }
+        else if (d == UP) {
+            position.x = player.GetPosition().x + player.GetSize() / 2;
+            position.y = player.GetPosition().y;
+        }
+        else if (d == DOWN) {
+            position.x = player.GetPosition().x + player.GetSize() / 2;
+            position.y = player.GetPosition().y + player.GetSize();
+        }
+
+        size = 10;
+        color = { 0, 0, 0 };
     }
 };
 
@@ -258,12 +292,15 @@ public:
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PLAYER player{ 50, 50, 50, COLOR{255, 0, 0} };
-    static BULLET bullets[10];
+    //static BULLET bullets[10];
+
+    static std::array<BULLET, 10> bullets;
+    //static std::vector<BULLET> bullets;
 
     switch (message)
     {
     case WM_CREATE:
-        SetTimer(hWnd, 1, 1000, NULL);
+        //SetTimer(hWnd, 1, 1000, NULL);
         SetTimer(hWnd, 2, 10, NULL);
         break;
     case WM_KEYDOWN:
@@ -298,7 +335,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case 1:
-            player.Move(1, 0);
+
             break;
         case 2:
             for (BULLET& bullet : bullets) {
@@ -321,12 +358,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
             
+            SelectObject(hdc, OldPen);
+            DeleteObject(NewPen);
+
+            NewPen = CreatePen(PS_SOLID, 2, RGB(bullets[0].GetColor().r, bullets[0].GetColor().g, bullets[0].GetColor().b));
+            OldPen = (HPEN)SelectObject(hdc, NewPen);
 
             for (const BULLET& bullet : bullets) {
                 if (bullet.isActive) {
                     Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());
                 }
             }
+
             SelectObject(hdc, OldPen);
             DeleteObject(NewPen);
 
