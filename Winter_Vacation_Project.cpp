@@ -1,5 +1,4 @@
 ﻿// Winter_Vacation_Project.cpp : 애플리케이션에 대한 진입점을 정의합니다.
-//
 
 #include "framework.h"
 #include "Winter_Vacation_Project.h"
@@ -111,6 +110,54 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
+struct COLOR {
+    BYTE r, g, b;
+};
+
+struct POSITION {
+    int x, y;
+};
+
+class UNIT {
+protected: 
+    POSITION position;
+    int size;
+    COLOR color;
+};
+
+class MONSTER : UNIT {
+
+};
+
+class PLAYER : UNIT {
+public:
+    PLAYER(int dx, int dy, int dsize, COLOR dcolor) {
+        position.x = dx;
+        position.y = dy;
+        size = dsize;
+        color = dcolor;
+    }
+
+    void Move(int dx, int dy) {
+        if(position.x + dx >= 0 && position.x + size + dx <= 100)
+            position.x += dx;
+        if(position.y + dy >= 0 && position.y + size + dy <= 100)
+            position.y += dy;
+    }
+
+    COLOR GetColor() {
+        return color;
+    }
+
+    POSITION GetPosition() {
+        return position;
+    }
+
+    int GetSize() {
+        return size;
+    }
+};
+
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -120,33 +167,58 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_PAINT    - 주 창을 그립니다.
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
-//
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static PLAYER player{ 50, 50, 50, COLOR{255, 0, 0} };
+
     switch (message)
     {
-    case WM_COMMAND:
+    case WM_CREATE:
+        SetTimer(hWnd, 1, 1000, NULL);
+        break;
+    case WM_KEYDOWN:
+        switch (wParam)
         {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+        case VK_RIGHT:
+            player.Move(10, 0);
+            break;
+        case VK_UP:
+            player.Move(0, -10);
+            break;
+        case VK_DOWN:
+            player.Move(0, 10);
+            break;
+        case VK_LEFT:
+            player.Move(-10, 0);
+            break;
         }
+
+        InvalidateRect(hWnd, NULL, TRUE);
+        break;
+    case WM_TIMER:
+        switch (wParam)
+        {
+        case 1:
+            player.Move(1, 0);
+            break;
+        }
+
+        InvalidateRect(hWnd, NULL, TRUE);
         break;
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+
+            HPEN NewPen = CreatePen(PS_SOLID, 2, RGB(player.GetColor().r, player.GetColor().g, player.GetColor().b));
+            HPEN OldPen = (HPEN)SelectObject(hdc, NewPen);
+
+            Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
+
+            SelectObject(hdc, OldPen);
+            DeleteObject(NewPen);
+
             EndPaint(hWnd, &ps);
         }
         break;
