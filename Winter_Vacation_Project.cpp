@@ -189,36 +189,37 @@ public:
         isActive = false;
     }
 
-    //BULLET(PLAYER player) {
-    //    d = RIGHT;
-    //    if (d == RIGHT) {
-    //        position.x = player.GetPosition().x + player.GetSize();
-    //        position.y = player.GetPosition().y + player.GetSize() / 2;
-    //    }
+    BULLET(PLAYER player) {
+        d = player.GetDirection();
 
-    //    else if (d == LEFT) {
-    //        position.x = player.GetPosition().x;
-    //        position.y = player.GetPosition().y + player.GetSize() / 2;
-    //    }
+        if (d == RIGHT) {
+            position.x = player.GetPosition().x + player.GetSize();
+            position.y = player.GetPosition().y + player.GetSize() / 2;
+        }
 
-    //    else if (d == UP) {
-    //        position.x = player.GetPosition().x + player.GetSize() / 2;
-    //        position.y = player.GetPosition().y;
-    //    }
+        else if (d == LEFT) {
+            position.x = player.GetPosition().x;
+            position.y = player.GetPosition().y + player.GetSize() / 2;
+        }
 
-    //    else if (d == DOWN) {
-    //        position.x = player.GetPosition().x + player.GetSize() / 2;
-    //        position.y = player.GetPosition().y + player.GetSize();
-    //    }
-    //    size = 10;
-    //    color = { 0, 0, 0 };
-    //}
+        else if (d == UP) {
+            position.x = player.GetPosition().x + player.GetSize() / 2;
+            position.y = player.GetPosition().y;
+        }
+
+        else if (d == DOWN) {
+            position.x = player.GetPosition().x + player.GetSize() / 2;
+            position.y = player.GetPosition().y + player.GetSize();
+        }
+        size = 10;
+        color = { 0, 0, 0 };
+    }
 
     void Move(int amount) {
         if (d == RIGHT) {
             if (position.x + amount <= MAP_SIZE)
                 position.x += amount;
-            else
+            else 
                 isActive = false;
         }
         if (d == LEFT) {
@@ -253,30 +254,6 @@ public:
     int GetSize() const {
         return size;
     }
-
-    void initiallization(PLAYER player) {
-        d = player.GetDirection();
-
-        if (d == RIGHT) {
-            position.x = player.GetPosition().x + player.GetSize();
-            position.y = player.GetPosition().y + player.GetSize() / 2;
-        }
-        else if (d == LEFT) {
-            position.x = player.GetPosition().x;
-            position.y = player.GetPosition().y + player.GetSize() / 2;
-        }
-        else if (d == UP) {
-            position.x = player.GetPosition().x + player.GetSize() / 2;
-            position.y = player.GetPosition().y;
-        }
-        else if (d == DOWN) {
-            position.x = player.GetPosition().x + player.GetSize() / 2;
-            position.y = player.GetPosition().y + player.GetSize();
-        }
-
-        size = 10;
-        color = { 0, 0, 0 };
-    }
 };
 
 //
@@ -294,13 +271,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     static PLAYER player{ 50, 50, 50, COLOR{255, 0, 0} };
     //static BULLET bullets[10];
 
-    static std::array<BULLET, 10> bullets;
-    //static std::vector<BULLET> bullets;
+    //static std::array<BULLET, 10> bullets;
+    static std::vector<BULLET> bullets;
 
     switch (message)
     {
     case WM_CREATE:
-        //SetTimer(hWnd, 1, 1000, NULL);
+        SetTimer(hWnd, 1, 1000, NULL);
         SetTimer(hWnd, 2, 10, NULL);
         break;
     case WM_KEYDOWN:
@@ -319,13 +296,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             player.Move(-10, 0);
             break;
         case VK_SPACE:
-            for (BULLET& bullet : bullets) {
-                if (!bullet.isActive) {
-                    bullet.isActive = true;
-                    bullet.initiallization(player);
-                    break;
-                }
-            }
+            BULLET bullet{player};
+            bullets.emplace_back(bullet);
             break;
         }
 
@@ -334,14 +306,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_TIMER:
         switch (wParam)
         {
-        case 1:
-
+        case 1: {
+            for (int index = 0; index < bullets.size(); ++index) {
+                if (!bullets[index].isActive) {
+                    bullets.erase(bullets.begin() + index);
+                    index--;
+                }
+            }
             break;
+        }
         case 2:
             for (BULLET& bullet : bullets) {
-                if (bullet.isActive) {
-                    bullet.Move(10);
-                }
+                bullet.Move(10);
             }
             break;
         }
@@ -361,18 +337,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             SelectObject(hdc, OldPen);
             DeleteObject(NewPen);
 
-            NewPen = CreatePen(PS_SOLID, 2, RGB(bullets[0].GetColor().r, bullets[0].GetColor().g, bullets[0].GetColor().b));
-            OldPen = (HPEN)SelectObject(hdc, NewPen);
+            if (!bullets.empty()) {
+                NewPen = CreatePen(PS_SOLID, 2, RGB(bullets[0].GetColor().r, bullets[0].GetColor().g, bullets[0].GetColor().b));
+                OldPen = (HPEN)SelectObject(hdc, NewPen);
 
-            for (const BULLET& bullet : bullets) {
-                if (bullet.isActive) {
-                    Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());
+                for (const BULLET& bullet : bullets) {
+                    if(bullet.isActive)
+                       Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());    
                 }
+
+                SelectObject(hdc, OldPen);
+                DeleteObject(NewPen);
             }
-
-            SelectObject(hdc, OldPen);
-            DeleteObject(NewPen);
-
             EndPaint(hWnd, &ps);
         }
         break;
