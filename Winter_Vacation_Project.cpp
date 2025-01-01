@@ -4,6 +4,13 @@
 #include "Winter_Vacation_Project.h"
 #include <array>
 #include <vector>
+#include <random>
+
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_int_distribution<int> dis(500, 1300);
+std::uniform_int_distribution<int> dis2(500, 800);
+
 
 #define MAX_LOADSTRING 100
 
@@ -127,15 +134,26 @@ protected:
     COLOR color;
 };
 
-class MONSTER : UNIT {
-
-};
-
 enum direction {
     RIGHT = 0,
     LEFT,
     UP,
     DOWN,
+};
+
+class MONSTER : UNIT {
+    enum direction d;
+public:
+    MONSTER(int mx, int my, int msize, COLOR mcolor) {
+        position.x = dis(gen);
+        position.y = dis2(gen);
+        size = msize;
+        color = mcolor;
+    }
+    
+   /* void Move(int mx, int my) {
+        if(position.x + mx <= 500 || position.x + mx >= 1300)
+    }*/
 };
 
 constexpr int MAP_SIZE = 500;
