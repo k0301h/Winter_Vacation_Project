@@ -119,6 +119,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
+constexpr int MAP_SIZE = 500;
+constexpr int MAP_SIZE2 = 1300;
+constexpr int MAP_SIZE3 = 800;
+
 struct COLOR {
     BYTE r, g, b;
 };
@@ -151,12 +155,19 @@ public:
         color = mcolor;
     }
     
-   /* void Move(int mx, int my) {
-        if(position.x + mx <= 500 || position.x + mx >= 1300)
-    }*/
+    void Move(int mx, int my) {
+       
+    }
+
+    POSITION GetPosition() {
+        return position;
+    }
+
+    int GetSize() {
+        return size;
+    }
 };
 
-constexpr int MAP_SIZE = 500;
 
 class PLAYER : UNIT {
     enum direction d;
@@ -204,7 +215,7 @@ public:
     bool isActive;
 
     BULLET() {
-        isActive = false;
+        isActive = false;   
     }
 
     BULLET(PLAYER player) {
@@ -288,8 +299,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PLAYER player{ 50, 50, 50, COLOR{255, 0, 0} };
     //static BULLET bullets[10];
+    static MONSTER monster{ dis(gen), dis2(gen), 50, COLOR{125, 125, 0 }};
 
     //static std::array<BULLET, 10> bullets;
+    static std::vector<MONSTER> monster;
     static std::vector<BULLET> bullets;
 
     switch (message)
@@ -351,6 +364,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HPEN OldPen = (HPEN)SelectObject(hdc, NewPen);
 
             Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
+           
+            Rectangle(hdc, monster.GetPosition().x, monster.GetPosition().y, monster.GetPosition().x + monster.GetSize(), monster.GetPosition().y + monster.GetSize());
             
             SelectObject(hdc, OldPen);
             DeleteObject(NewPen);
