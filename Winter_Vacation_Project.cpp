@@ -8,8 +8,10 @@
 
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_int_distribution<int> dis(500, 1300);
-std::uniform_int_distribution<int> dis2(500, 800);
+std::uniform_int_distribution<int> disX1(500, 1000);
+std::uniform_int_distribution<int> disX2(50, 1000);
+std::uniform_int_distribution<int> disY1(50, 600);
+std::uniform_int_distribution<int> disY2(300, 600);
 
 
 #define MAX_LOADSTRING 100
@@ -120,8 +122,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 }
 
 constexpr int MAP_SIZE = 500;
-constexpr int MAP_SIZE2 = 1300;
-constexpr int MAP_SIZE3 = 800;
+constexpr int MAP_SIZEX = 1000;
+constexpr int MAP_SIZEY = 600;
 
 struct COLOR {
     BYTE r, g, b;
@@ -149,14 +151,23 @@ class MONSTER : UNIT {
     enum direction d;
 public:
     MONSTER(int mx, int my, int msize, COLOR mcolor) {
-        position.x = dis(gen);
-        position.y = dis2(gen);
+        position.x = mx;
+        position.y = my;
         size = msize;
         color = mcolor;
     }
     
-    void Move(int mx, int my) {
-       
+    void Move(int amount) {
+        if (d == RIGHT) {
+            if (position.x + amount <= MAP_SIZEX)
+                position.x += amount;
+            if (position.x + amount == MAP_SIZEX)
+                position.x -= amount;
+        }
+        if (d == LEFT) {
+            if (position.x == 50)
+                position.x += amount;
+        }
     }
 
     POSITION GetPosition() {
@@ -295,14 +306,14 @@ public:
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PLAYER player{ 50, 50, 50, COLOR{255, 0, 0} };
     //static BULLET bullets[10];
-    static MONSTER monster{ dis(gen), dis2(gen), 50, COLOR{125, 125, 0 }};
-
+    static MONSTER monsters{ disX1(gen), disY1(gen), 50, COLOR{125, 125, 0}};
+    std::array<MONSTER, 10> monsters;
     //static std::array<BULLET, 10> bullets;
-    static std::vector<MONSTER> monster;
     static std::vector<BULLET> bullets;
 
     switch (message)
@@ -310,6 +321,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         SetTimer(hWnd, 1, 1000, NULL);
         SetTimer(hWnd, 2, 10, NULL);
+        SetTimer(hWnd, 3, 400, NULL);
         break;
     case WM_KEYDOWN:
         switch (wParam)
@@ -365,10 +377,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
            
-            Rectangle(hdc, monster.GetPosition().x, monster.GetPosition().y, monster.GetPosition().x + monster.GetSize(), monster.GetPosition().y + monster.GetSize());
-            
             SelectObject(hdc, OldPen);
             DeleteObject(NewPen);
+            
+            for (int i = 0; i < 10; ++i) {
+                Rectangle(hdc, monsters.GetPosition().x, monsters.GetPosition().y, monsters.GetPosition().x + monsters.GetSize(), monsters.GetPosition().y + monsters.GetSize());
+            SelectObject(hdc, OldPen);
+            DeleteObject(NewPen);
+            }
 
             if (!bullets.empty()) {
                 NewPen = CreatePen(PS_SOLID, 2, RGB(bullets[0].GetColor().r, bullets[0].GetColor().g, bullets[0].GetColor().b));
