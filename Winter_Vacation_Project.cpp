@@ -5,6 +5,7 @@
 #include <array>
 #include <vector>
 #include <random>
+#include <cmath>
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -161,19 +162,10 @@ public:
         color = mcolor;
     }
     
-    void Move(int amount) {
-        if (d == RIGHT) {
-            if (position.x + size + amount <= MAP_SIZEX)
-                position.x += amount;
-            else
-                d = LEFT;
-        }
-        if (d == LEFT) {
-            if( position.x - amount >= 0 )
-            position.x -= amount;
-            else
-                d = RIGHT;
-        }
+    void Move(POSITION distance) {
+        double total_length = sqrt((distance.x * distance.x) + (distance.y * distance.y));
+        position.x += distance.x * 10 / total_length;
+        position.y += distance.y * 10 / total_length;
     }
 
     POSITION GetPosition() {
@@ -226,7 +218,7 @@ public:
         return color;
     }
 
-    POSITION GetPosition() {
+    POSITION GetPosition() const {
         return position;
     }
 
@@ -315,6 +307,8 @@ public:
     }
 };
 
+void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster);
+
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -345,7 +339,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         SetTimer(hWnd, 1, 1000, NULL);
         SetTimer(hWnd, 2, 10, NULL);
-        SetTimer(hWnd, 3, 10, NULL);
+        SetTimer(hWnd, 3, 100, NULL);
         break;
     case WM_KEYDOWN:
         switch (wParam)
@@ -388,7 +382,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case 3:
             for (auto& monster : monsters) {
-                monster.Move(10);
+                MoveMonsterTowardPlayer( player, monster);
             }
         }
 
@@ -461,9 +455,9 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-void MoveMonsterTowardPlayer(PLAYER player, MONSTER monster) {
+void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster) {
     POSITION distance = { player.GetPosition().x - monster.GetPosition().x, player.GetPosition().y - monster.GetPosition().y };
-    monster.Move(10);
+    monster.Move(distance);
 }
 
 void CheckCollision() {

@@ -1,2 +1,4 @@
 ﻿  Winter_Vacation_Project.cpp
+C:\Users\신동호\source\repos\Winter_Vacation_Project\Winter_Vacation_Project.cpp(167,39): warning C4244: '+=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\신동호\source\repos\Winter_Vacation_Project\Winter_Vacation_Project.cpp(168,39): warning C4244: '+=': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Winter_Vacation_Project.vcxproj -> C:\Users\신동호\source\repos\Winter_Vacation_Project\x64\Debug\Winter_Vacation_Project.exe
