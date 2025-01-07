@@ -149,7 +149,11 @@ enum direction {
 
 class MONSTER : UNIT {
     enum direction d;
+    int hp = 50;
+
 public:
+    MONSTER() {}
+
     MONSTER(int mx, int my, int msize, COLOR mcolor) {
         position.x = mx;
         position.y = my;
@@ -159,14 +163,16 @@ public:
     
     void Move(int amount) {
         if (d == RIGHT) {
-            if (position.x + amount <= MAP_SIZEX)
+            if (position.x + size + amount <= MAP_SIZEX)
                 position.x += amount;
-            if (position.x + amount == MAP_SIZEX)
-                position.x -= amount;
+            else
+                d = LEFT;
         }
         if (d == LEFT) {
-            if (position.x == 50)
-                position.x += amount;
+            if( position.x - amount >= 0 )
+            position.x -= amount;
+            else
+                d = RIGHT;
         }
     }
 
@@ -177,11 +183,24 @@ public:
     int GetSize() {
         return size;
     }
+
+    COLOR GetColor() {
+        return color;
+    }
+
+    void initialize(int mx, int my, int msize, COLOR mcolor) {
+        position.x = mx;
+        position.y = my;
+        size = msize;
+        color = mcolor;
+    }
 };
 
 
 class PLAYER : UNIT {
     enum direction d;
+    int hp = 100;
+    int atk = 10;
 public:
     PLAYER(int dx, int dy, int dsize, COLOR dcolor) {
         position.x = dx;
@@ -304,24 +323,29 @@ public:
 //  WM_COMMAND  - 애플리케이션 메뉴를 처리합니다.
 //  WM_PAINT    - 주 창을 그립니다.
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
-//
+
+
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static PLAYER player{ 50, 50, 50, COLOR{255, 0, 0} };
     //static BULLET bullets[10];
-    static MONSTER monsters{ disX1(gen), disY1(gen), 50, COLOR{125, 125, 0}};
-    std::array<MONSTER, 10> monsters;
+    //static MONSTER monsters{ disX1(gen), disY1(gen), 50, COLOR{125, 125, 0}};
+    static std::array<MONSTER, 10> monsters;
     //static std::array<BULLET, 10> bullets;
     static std::vector<BULLET> bullets;
 
     switch (message)
     {
     case WM_CREATE:
+        for (auto& monster : monsters) {
+            monster.initialize(disX1(gen), disY1(gen), 50, COLOR{ 122, 125 , 0 });
+        }
+
         SetTimer(hWnd, 1, 1000, NULL);
         SetTimer(hWnd, 2, 10, NULL);
-        SetTimer(hWnd, 3, 400, NULL);
+        SetTimer(hWnd, 3, 10, NULL);
         break;
     case WM_KEYDOWN:
         switch (wParam)
@@ -339,7 +363,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             player.Move(-10, 0);
             break;
         case VK_SPACE:
-            BULLET bullet{player};
+            BULLET bullet{ player };
             bullets.emplace_back(bullet);
             break;
         }
@@ -349,7 +373,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_TIMER:
         switch (wParam)
         {
-        case 1: {
+        case 1:
             for (int index = 0; index < bullets.size(); ++index) {
                 if (!bullets[index].isActive) {
                     bullets.erase(bullets.begin() + index);
@@ -357,50 +381,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
             }
             break;
-        }
         case 2:
             for (BULLET& bullet : bullets) {
                 bullet.Move(10);
             }
             break;
+        case 3:
+            for (auto& monster : monsters) {
+                monster.Move(10);
+            }
         }
 
         InvalidateRect(hWnd, NULL, TRUE);
         break;
     case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
 
-            HPEN NewPen = CreatePen(PS_SOLID, 2, RGB(player.GetColor().r, player.GetColor().g, player.GetColor().b));
-            HPEN OldPen = (HPEN)SelectObject(hdc, NewPen);
+        HPEN NewPen = CreatePen(PS_SOLID, 2, RGB(player.GetColor().r, player.GetColor().g, player.GetColor().b));
+        HPEN OldPen = (HPEN)SelectObject(hdc, NewPen);
 
-            Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
-           
-            SelectObject(hdc, OldPen);
-            DeleteObject(NewPen);
-            
-            for (int i = 0; i < 10; ++i) {
-                Rectangle(hdc, monsters.GetPosition().x, monsters.GetPosition().y, monsters.GetPosition().x + monsters.GetSize(), monsters.GetPosition().y + monsters.GetSize());
-            SelectObject(hdc, OldPen);
-            DeleteObject(NewPen);
-            }
+        Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
 
-            if (!bullets.empty()) {
-                NewPen = CreatePen(PS_SOLID, 2, RGB(bullets[0].GetColor().r, bullets[0].GetColor().g, bullets[0].GetColor().b));
-                OldPen = (HPEN)SelectObject(hdc, NewPen);
+        SelectObject(hdc, OldPen);
+        DeleteObject(NewPen);
 
-                for (const BULLET& bullet : bullets) {
-                    if(bullet.isActive)
-                       Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());    
-                }
+        NewPen = CreatePen(PS_SOLID, 2, RGB(monsters[0].GetColor().r, monsters[0].GetColor().g, monsters[0].GetColor().b));
+        OldPen = (HPEN)SelectObject(hdc, NewPen);
 
-                SelectObject(hdc, OldPen);
-                DeleteObject(NewPen);
-            }
-            EndPaint(hWnd, &ps);
+        for (int i = 0; i < 10; ++i) {
+            Rectangle(hdc, monsters[i].GetPosition().x, monsters[i].GetPosition().y, monsters[i].GetPosition().x + monsters[i].GetSize(), monsters[i].GetPosition().y + monsters[i].GetSize());
         }
+
+        SelectObject(hdc, OldPen);
+        DeleteObject(NewPen);
+
+        if (!bullets.empty()) {
+            NewPen = CreatePen(PS_SOLID, 2, RGB(bullets[0].GetColor().r, bullets[0].GetColor().g, bullets[0].GetColor().b));
+            OldPen = (HPEN)SelectObject(hdc, NewPen);
+
+            for (const BULLET& bullet : bullets) {
+                if (bullet.isActive)
+                    Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());
+            }
+
+            SelectObject(hdc, OldPen);
+            DeleteObject(NewPen);
+        }
+        EndPaint(hWnd, &ps);
         break;
+    }
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -428,4 +459,13 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+void MoveMonsterTowardPlayer(PLAYER player, MONSTER monster) {
+    POSITION distance = { player.GetPosition().x - monster.GetPosition().x, player.GetPosition().y - monster.GetPosition().y };
+    monster.Move(10);
+}
+
+void CheckCollision() {
+
 }
