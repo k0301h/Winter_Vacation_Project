@@ -186,6 +186,10 @@ public:
         size = msize;
         color = mcolor;
     }
+
+    void hp(int hp) {
+        int m_hp = hp;
+    }
 };
 
 
@@ -233,6 +237,7 @@ public:
 
 class BULLET : public UNIT {
     enum direction d;
+    int hp = 10;
 public:
     bool isActive;
 
@@ -305,9 +310,13 @@ public:
     int GetSize() const {
         return size;
     }
+    int hp(int hp) {
+        hp = 10;
+    }
 };
 
 void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster);
+void CheckCollision(BULLET bullet, MONSTER monster);
 
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -460,6 +469,7 @@ void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster) {
     monster.Move(distance);
 }
 
-void CheckCollision() {
-
+void CheckCollision( BULLET bullet, MONSTER monster) {
+    if (bullet.GetPosition().x + bullet.GetSize() = monster.GetPosition().x)
+        monster.hp(50) - bullet.hp();
 }
