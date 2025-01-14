@@ -470,6 +470,6 @@ void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster) {
 }
 
 void CheckCollision( BULLET bullet, MONSTER monster) {
-    if (bullet.GetPosition().x + bullet.GetSize() = monster.GetPosition().x)
-        monster.hp(50) - bullet.hp();
+    if ( bullet.GetPosition().x + bullet.GetSize() = monster.GetPosition().x)
+        
 }
