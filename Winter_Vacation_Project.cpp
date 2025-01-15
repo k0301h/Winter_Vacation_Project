@@ -187,11 +187,25 @@ public:
         color = mcolor;
     }
 
-    void hp(int hp) {
-        int m_hp = hp;
+    void SetSize(int value) {
+        size = value;
     }
-};
 
+    bool IsDie() {
+        if (hp == 0) {
+            return true;
+        }
+            return false;
+    }
+
+    int GetHp() {
+        return hp;
+    }
+    void SetHp(int value) {
+        hp = value;
+    }
+
+};
 
 class PLAYER : UNIT {
     enum direction d;
@@ -271,32 +285,32 @@ public:
         color = { 0, 0, 0 };
     }
 
-    void Move(int amount) {
+    bool Move(int amount) {
         if (d == RIGHT) {
             if (position.x + amount <= MAP_SIZE)
                 position.x += amount;
             else 
-                isActive = false;
+                return false;
         }
         if (d == LEFT) {
             if( position.x >= -MAP_SIZE)
                 position.x -= amount;
             else
-                isActive = false;
+                return false;
         }
         if (d == UP) {
             if( position.y - amount >= -MAP_SIZE)
                 position.y -= amount;
             else
-                isActive = false;
+                return false;
         }
         if (d == DOWN) {
             if( position.y + amount <= MAP_SIZE)
                 position.y += amount;
             else
-                isActive = false;
+               return false;
         }
-        
+        return true;
     }
 
     COLOR GetColor() {
@@ -310,13 +324,10 @@ public:
     int GetSize() const {
         return size;
     }
-    int hp(int hp) {
-        hp = 10;
-    }
 };
 
 void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster);
-void CheckCollision(BULLET bullet, MONSTER monster);
+bool CheckCollision(const BULLET& bullet, MONSTER& monster);
 
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -326,8 +337,6 @@ void CheckCollision(BULLET bullet, MONSTER monster);
 //  WM_COMMAND  - 애플리케이션 메뉴를 처리합니다.
 //  WM_PAINT    - 주 창을 그립니다.
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
-
-
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -346,9 +355,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             monster.initialize(disX1(gen), disY1(gen), 50, COLOR{ 122, 125 , 0 });
         }
 
-        SetTimer(hWnd, 1, 1000, NULL);
+        SetTimer(hWnd, 1, 100, NULL);
         SetTimer(hWnd, 2, 10, NULL);
-        SetTimer(hWnd, 3, 100, NULL);
+        SetTimer(hWnd, 3, 500, NULL);
         break;
     case WM_KEYDOWN:
         switch (wParam)
@@ -385,8 +394,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             break;
         case 2:
-            for (BULLET& bullet : bullets) {
-                bullet.Move(10);
+            for (int j = 0; j < bullets.size(); ++j ) {
+                if (!bullets[j].Move(10)) {
+                    bullets.erase(bullets.begin() + j);
+                    continue;
+                }
+                for (int i = 0; i < monsters.size(); ++i) {
+                    if (!monsters[i].IsDie()) {
+                        if (CheckCollision(bullets[j], monsters[i])) {
+                            bullets.erase(bullets.begin() + j);
+                            break;
+                        }
+                    }
+                }
             }
             break;
         case 3:
@@ -394,7 +414,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 MoveMonsterTowardPlayer( player, monster);
             }
         }
-
+        
         InvalidateRect(hWnd, NULL, TRUE);
         break;
     case WM_PAINT:
@@ -425,7 +445,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             OldPen = (HPEN)SelectObject(hdc, NewPen);
 
             for (const BULLET& bullet : bullets) {
-                if (bullet.isActive)
                     Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());
             }
 
@@ -469,7 +488,13 @@ void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster) {
     monster.Move(distance);
 }
 
-void CheckCollision( BULLET bullet, MONSTER monster) {
-    if ( bullet.GetPosition().x + bullet.GetSize() = monster.GetPosition().x)
-        
+bool CheckCollision( const BULLET& bullet, MONSTER& monster ) {
+    if (bullet.GetPosition().x > monster.GetPosition().x && bullet.GetPosition().x + bullet.GetSize() < monster.GetPosition().x + monster.GetSize() ) {
+        if (bullet.GetPosition().y > monster.GetPosition().y && bullet.GetPosition().y + bullet.GetSize() < monster.GetPosition().y + monster.GetSize() ) {
+            monster.SetSize(monster.GetSize() - 10);
+            monster.SetHp(monster.GetHp() - 10);
+            return true;
+        }
+    }
+    return false;
 }

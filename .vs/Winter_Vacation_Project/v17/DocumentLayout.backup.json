@@ -7,6 +7,12 @@
       "RelativeMoniker": "D:0:0:{6DBE006A-D367-420A-A912-A2F448757033}|Winter_Vacation_Project.vcxproj|solutionrelative:Winter_Vacation_Project.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\vector||{3B902123-F8A7-4915-9F01-361F908088D0}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6DBE006A-D367-420A-A912-A2F448757033}|Winter_Vacation_Project.vcxproj|C:\\PROGRAM FILES\\MICROSOFT VISUAL STUDIO\\2022\\COMMUNITY\\VC\\TOOLS\\MSVC\\14.41.34120\\INCLUDE\\XUTILITY||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{6DBE006A-D367-420A-A912-A2F448757033}|Winter_Vacation_Project.vcxproj|C:\\Users\\\uC2E0\uB3D9\uD638\\source\\repos\\Winter_Vacation_Project\\header\\framework.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{6DBE006A-D367-420A-A912-A2F448757033}|Winter_Vacation_Project.vcxproj|solutionrelative:header\\framework.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -26,11 +32,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 486,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "vector",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\vector",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\vector",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\vector",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\vector",
+              "ViewState": "AgIAAE4HAAAAAAAAAAAnwF8HAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-01-15T07:51:40.702Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "xutility",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\xutility",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\xutility",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\xutility",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.41.34120\\include\\xutility",
+              "ViewState": "AgIAAGcXAAAAAAAAAAAEwHkXAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-01-15T07:46:07.006Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Winter_Vacation_Project.h",
               "DocumentMoniker": "C:\\Users\\\uC2E0\uB3D9\uD638\\source\\repos\\Winter_Vacation_Project\\header\\Winter_Vacation_Project.h",
               "RelativeDocumentMoniker": "header\\Winter_Vacation_Project.h",
@@ -43,7 +75,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "Winter_Vacation_Project.rc",
               "DocumentMoniker": "C:\\Users\\\uC2E0\uB3D9\uD638\\source\\repos\\Winter_Vacation_Project\\Winter_Vacation_Project.rc",
               "RelativeDocumentMoniker": "Winter_Vacation_Project.rc",
@@ -55,7 +87,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "framework.h",
               "DocumentMoniker": "C:\\Users\\\uC2E0\uB3D9\uD638\\source\\repos\\Winter_Vacation_Project\\header\\framework.h",
               "RelativeDocumentMoniker": "header\\framework.h",
@@ -74,7 +106,7 @@
               "RelativeDocumentMoniker": "Winter_Vacation_Project.cpp",
               "ToolTip": "C:\\Users\\\uC2E0\uB3D9\uD638\\source\\repos\\Winter_Vacation_Project\\Winter_Vacation_Project.cpp*",
               "RelativeToolTip": "Winter_Vacation_Project.cpp*",
-              "ViewState": "AgIAALgBAAAAAAAAAAAmwNABAAAIAAAAAAAAAA==",
+              "ViewState": "AgIAAFsBAAAAAAAAAAAmwGcBAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-12-31T08:19:59.064Z",
               "EditorCaption": ""
