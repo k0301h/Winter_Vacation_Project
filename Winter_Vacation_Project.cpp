@@ -328,6 +328,7 @@ public:
 
 void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster);
 bool CheckCollision(const BULLET& bullet, MONSTER& monster);
+bool CheckCollision_player_monster(const PLAYER& player, MONSTER& monster);
 
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -488,7 +489,7 @@ void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster) {
     monster.Move(distance);
 }
 
-bool CheckCollision( const BULLET& bullet, MONSTER& monster ) {
+bool CheckCollision_bullet_monster( const BULLET& bullet, MONSTER& monster ) {
     if (bullet.GetPosition().x > monster.GetPosition().x && bullet.GetPosition().x + bullet.GetSize() < monster.GetPosition().x + monster.GetSize() ) {
         if (bullet.GetPosition().y > monster.GetPosition().y && bullet.GetPosition().y + bullet.GetSize() < monster.GetPosition().y + monster.GetSize() ) {
             monster.SetSize(monster.GetSize() - 10);
@@ -497,4 +498,10 @@ bool CheckCollision( const BULLET& bullet, MONSTER& monster ) {
         }
     }
     return false;
+}
+
+bool CheckCollision_player_monster(const PLAYER& player, MONSTER& monster) {
+    float distance = player.GetPosition().x - 
+    float CollisionDistance = 0.5f;
+
 }
