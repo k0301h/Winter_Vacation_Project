@@ -327,8 +327,8 @@ public:
 };
 
 void MoveMonsterTowardPlayer(const PLAYER& player, MONSTER& monster);
-bool CheckCollision(const BULLET& bullet, MONSTER& monster);
-bool CheckCollision_player_monster(const PLAYER& player, MONSTER& monster);
+bool CheckCollision_bullet_monster(const BULLET& bullet, MONSTER& monster);
+// bool CheckCollision_player_monster(const PLAYER& player, MONSTER& monster);
 
 //
 //  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -402,7 +402,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 for (int i = 0; i < monsters.size(); ++i) {
                     if (!monsters[i].IsDie()) {
-                        if (CheckCollision(bullets[j], monsters[i])) {
+                        if (CheckCollision_bullet_monster(bullets[j], monsters[i])) {
                             bullets.erase(bullets.begin() + j);
                             break;
                         }
@@ -416,42 +416,55 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         
-        InvalidateRect(hWnd, NULL, TRUE);
+        InvalidateRect(hWnd, NULL, false);
         break;
     case WM_PAINT:
     {
+        HDC mdc;
+        HBITMAP hBitmap;
+        RECT rt;
+
         PAINTSTRUCT ps;
+        GetClientRect(hWnd, &rt);
         HDC hdc = BeginPaint(hWnd, &ps);
+        mdc = CreateCompatibleDC(hdc);
+        hBitmap = CreateCompatibleBitmap(hdc, rt.right, rt.bottom); //--- 메모리 DC와 연결할 비트맵 만들기
+        SelectObject(mdc, (HBITMAP)hBitmap);
 
         HPEN NewPen = CreatePen(PS_SOLID, 2, RGB(player.GetColor().r, player.GetColor().g, player.GetColor().b));
-        HPEN OldPen = (HPEN)SelectObject(hdc, NewPen);
+        HPEN OldPen = (HPEN)SelectObject(mdc, NewPen);
 
-        Rectangle(hdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
+        Rectangle(mdc, player.GetPosition().x, player.GetPosition().y, player.GetPosition().x + player.GetSize(), player.GetPosition().y + player.GetSize());
 
-        SelectObject(hdc, OldPen);
+        SelectObject(mdc, OldPen);
         DeleteObject(NewPen);
 
         NewPen = CreatePen(PS_SOLID, 2, RGB(monsters[0].GetColor().r, monsters[0].GetColor().g, monsters[0].GetColor().b));
-        OldPen = (HPEN)SelectObject(hdc, NewPen);
+        OldPen = (HPEN)SelectObject(mdc, NewPen);
 
         for (int i = 0; i < 10; ++i) {
-            Rectangle(hdc, monsters[i].GetPosition().x, monsters[i].GetPosition().y, monsters[i].GetPosition().x + monsters[i].GetSize(), monsters[i].GetPosition().y + monsters[i].GetSize());
+            Rectangle(mdc, monsters[i].GetPosition().x, monsters[i].GetPosition().y, monsters[i].GetPosition().x + monsters[i].GetSize(), monsters[i].GetPosition().y + monsters[i].GetSize());
         }
 
-        SelectObject(hdc, OldPen);
+
+        SelectObject(mdc, OldPen);
         DeleteObject(NewPen);
 
         if (!bullets.empty()) {
             NewPen = CreatePen(PS_SOLID, 2, RGB(bullets[0].GetColor().r, bullets[0].GetColor().g, bullets[0].GetColor().b));
-            OldPen = (HPEN)SelectObject(hdc, NewPen);
+            OldPen = (HPEN)SelectObject(mdc, NewPen);
 
             for (const BULLET& bullet : bullets) {
-                    Ellipse(hdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());
+                    Ellipse(mdc, bullet.GetPosition().x, bullet.GetPosition().y, bullet.GetPosition().x + bullet.GetSize(), bullet.GetPosition().y + bullet.GetSize());
             }
 
-            SelectObject(hdc, OldPen);
+            SelectObject(mdc, OldPen);
             DeleteObject(NewPen);
         }
+
+        //--- 마지막에 메모리 DC의 내용을 화면DC로 복사한다.
+        BitBlt(hdc, 0, 0, rt.right, rt.bottom, mdc, 0, 0, SRCCOPY);
+
         EndPaint(hWnd, &ps);
         break;
     }
@@ -500,8 +513,9 @@ bool CheckCollision_bullet_monster( const BULLET& bullet, MONSTER& monster ) {
     return false;
 }
 
-bool CheckCollision_player_monster(const PLAYER& player, MONSTER& monster) {
-    float distance = player.GetPosition().x - 
-    float CollisionDistance = 0.5f;
+//bool CheckCollision_player_monster(const PLAYER& player, MONSTER& monster) {
+//    float distance = player.GetPosition().x - 
+//    float CollisionDistance = 0.5f;
+//
+//}
 
-}
